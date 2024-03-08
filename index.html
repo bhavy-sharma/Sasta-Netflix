@@ -3,89 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Player with Webcams</title>
+    <title>Video Chat</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Sasta-Netflix</h1>
+        <h1>Video Chat</h1>
 
-        <!-- Input for choosing a video file -->
-        <input type="file" accept="video/*" id="videoInput">
-        
-        <!-- Video player -->
-        <video controls id="videoPlayer">
-            Your browser does not support the video tag.
-        </video>
-    </div>
-
-    <!-- Webcam stream container for bottom left -->
-    <div class="webcam-container" id="bottomLeftWebcamContainer"></div>
-
-    <!-- Webcam stream container for bottom right -->
-    <div class="webcam-container" id="bottomRightWebcamContainer"></div>
-
-    <!-- Controls -->
-    <div class="controls">
-        <div class="left-control">
-            <!-- Add controls for the left side -->
-            <button class="control-button">Left Control</button>
-        </div>
-        <div class="right-control">
-            <!-- Add controls for the right side -->
-            <button class="control-button">Right Control</button>
-        </div>
+        <!-- Form for entering name and room -->
+        <form id="joinForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <br>
+            <label for="room">Room:</label>
+            <input type="text" id="room" name="room" required>
+            <br>
+            <button type="submit">Join</button>
+        </form>
     </div>
 
     <script>
-        // Function to handle video file selection
-        document.getElementById('videoInput').addEventListener('change', function(event) {
-            var videoPlayer = document.getElementById('videoPlayer');
-            var file = this.files[0];
-            var objectURL = URL.createObjectURL(file);
-            videoPlayer.src = objectURL;
+        // JavaScript code for handling form submission
+        document.getElementById('joinForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Get the values entered by the user
+            var name = document.getElementById('name').value;
+            var room = document.getElementById('room').value;
+
+            // Redirect to sasta-netflix.html with query parameters
+            window.location.href = 'sasta-netflix.html?name=' + encodeURIComponent(name) + '&room=' + encodeURIComponent(room);
         });
 
-        // Example event listeners for the control buttons
-        document.querySelector('.left-control .control-button').addEventListener('click', function() {
-            // Perform action for left control button
-            console.log('Left control button clicked');
-        });
+        // Function to set up WebRTC connection based on room name
+        async function setupWebRTC(roomName) {
+            // Connect to signaling server and exchange offers/answers (not implemented here)
 
-        document.querySelector('.right-control .control-button').addEventListener('click', function() {
-            // Perform action for right control button
-            console.log('Right control button clicked');
-        });
+            // Get user media for local webcam stream
+            const localStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            
+            // Create peer connection
+            const peerConnection = new RTCPeerConnection();
 
-        // Dummy code to create and display dummy webcam streams
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function (stream) {
-                // Display local webcam stream on bottom left
-                var bottomLeftWebcamContainer = document.getElementById('bottomLeftWebcamContainer');
-                var leftVideo = document.createElement('video');
-                leftVideo.srcObject = stream;
-                leftVideo.autoplay = true;
-                leftVideo.muted = true; // Mute local video
-                bottomLeftWebcamContainer.appendChild(leftVideo);
-            })
-            .catch(function (err) {
-                console.error('Error accessing webcam: ' + err);
-            });
+            // Add local stream to peer connection
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
-        // Dummy code to create and display dummy remote webcam stream
-        var dummyStream = new MediaStream(); // Create an empty MediaStream object
-        navigator.mediaDevices.getUserMedia({ video: true }) // Access another user's webcam
-            .then(function (stream) {
-                // Display remote webcam stream on bottom right
-                var bottomRightWebcamContainer = document.getElementById('bottomRightWebcamContainer');
-                var rightVideo = document.createElement('video');
-                rightVideo.srcObject = stream;
-                rightVideo.autoplay = true;
-                bottomRightWebcamContainer.appendChild(rightVideo);
-            })
-            .catch(function (err) {
-                console.error('Error accessing remote webcam: ' + err);
-            });
+            // Handle incoming tracks from remote user
+            peerConnection.ontrack = event => {
+                const remoteVideo = document.createElement('video');
+                remoteVideo.srcObject = event.streams[0];
+                remoteVideo.autoplay = true;
+
+                // Display remote video in appropriate container based on room name
+                const bottomLeftWebcamContainer = document.getElementById('bottomLeftWebcamContainer');
+                const bottomRightWebcamContainer = document.getElementById('bottomRightWebcamContainer');
+
+                if (roomName === 'leftRoom') {
+                    bottomLeftWebcamContainer.appendChild(remoteVideo);
+                } else if (roomName === 'rightRoom') {
+                    bottomRightWebcamContainer.appendChild(remoteVideo);
+                }
+            };
+
+            // Offer to start the peer connection
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            // Exchange offer with signaling server (not implemented here)
+
+            // For demonstration, create a dummy answer from the remote user
+            const dummyAnswer = new RTCSessionDescription({ type: 'answer', sdp: 'dummy sdp' });
+            await peerConnection.setRemoteDescription(dummyAnswer);
+        }
+
+        // Call setupWebRTC function when the page loads
+        window.onload = function() {
+            // Get room name from query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomName = urlParams.get('room');
+
+            // Call setupWebRTC function with the room name
+            setupWebRTC(roomName);
+        };
     </script>
 </body>
 </html>
