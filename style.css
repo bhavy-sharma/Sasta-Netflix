@@ -59,3 +59,19 @@ video {
 .right-control {
     right: 20px; /* Adjust the right spacing for the right control div */
 }
+
+/* Additional styles for webcam containers */
+.webcam-container {
+    position: fixed;
+    bottom: 20px;
+    width: 30%; /* Adjust width as needed */
+    height: auto;
+}
+
+#bottomLeftWebcamContainer {
+    left: 20px;
+}
+
+#bottomRightWebcamContainer {
+    right: 20px;
+}

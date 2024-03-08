@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Player</title>
+    <title>Video Player with Webcams</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,6 +18,12 @@
             Your browser does not support the video tag.
         </video>
     </div>
+
+    <!-- Webcam stream container for bottom left -->
+    <div class="webcam-container" id="bottomLeftWebcamContainer"></div>
+
+    <!-- Webcam stream container for bottom right -->
+    <div class="webcam-container" id="bottomRightWebcamContainer"></div>
 
     <!-- Controls -->
     <div class="controls">
@@ -50,6 +56,36 @@
             // Perform action for right control button
             console.log('Right control button clicked');
         });
+
+        // Dummy code to create and display dummy webcam streams
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                // Display local webcam stream on bottom left
+                var bottomLeftWebcamContainer = document.getElementById('bottomLeftWebcamContainer');
+                var leftVideo = document.createElement('video');
+                leftVideo.srcObject = stream;
+                leftVideo.autoplay = true;
+                leftVideo.muted = true; // Mute local video
+                bottomLeftWebcamContainer.appendChild(leftVideo);
+            })
+            .catch(function (err) {
+                console.error('Error accessing webcam: ' + err);
+            });
+
+        // Dummy code to create and display dummy remote webcam stream
+        var dummyStream = new MediaStream(); // Create an empty MediaStream object
+        navigator.mediaDevices.getUserMedia({ video: true }) // Access another user's webcam
+            .then(function (stream) {
+                // Display remote webcam stream on bottom right
+                var bottomRightWebcamContainer = document.getElementById('bottomRightWebcamContainer');
+                var rightVideo = document.createElement('video');
+                rightVideo.srcObject = stream;
+                rightVideo.autoplay = true;
+                bottomRightWebcamContainer.appendChild(rightVideo);
+            })
+            .catch(function (err) {
+                console.error('Error accessing remote webcam: ' + err);
+            });
     </script>
 </body>
 </html>
