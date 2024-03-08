@@ -13,6 +13,33 @@
             var output = document.getElementById("running");
             output.src = URL.createObjectURL(source);
         }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let mediaDevices = navigator.mediaDevices;
+
+            let left = document.getElementById("leftWebcam");
+            let right = document.getElementById("rightWebcam");
+
+            // Accessing the user camera and video for left webcam
+            mediaDevices.getUserMedia({ video: true, audio: true })
+                .then((stream) => {
+                    left.srcObject = stream;
+                    left.addEventListener("loadedmetadata", () => {
+                        left.play();
+                    });
+                })
+                .catch(alert);
+
+            // Accessing the user camera and video for right webcam
+            mediaDevices.getUserMedia({ video: true, audio: true })
+                .then((stream) => {
+                    right.srcObject = stream;
+                    right.addEventListener("loadedmetadata", () => {
+                        right.play();
+                    });
+                })
+                .catch(alert);
+        });
     </script>
     <div class="container">
         <h1>Sasta-Netflix</h1>
@@ -22,21 +49,18 @@
     </div>
 
     <!-- Webcam stream container for bottom left -->
-    <div class="webcam-container" id="bottomLeftWebcamContainer"></div>
+    <div class="webcam-container" id="bottomLeftWebcamContainer">
+        <!-- WebRTC connection for left div -->
+        <video id="leftWebcam" class="video-container"></video>
+    </div>
 
     <!-- Webcam stream container for bottom right -->
-    <div class="webcam-container" id="bottomRightWebcamContainer"></div>
+    <div class="webcam-container" id="bottomRightWebcamContainer">
+        <!-- WebRTC connection for right div -->
+        <video id="rightWebcam" class="video-container"></video>
+    </div>
 
     <!-- Controls -->
-    <div class="controls">
-        <div class="left-control">
-            <!-- WebRTC connection for left div -->
-            <video id="leftWebcam" class="video-container"></video>
-        </div>
-        <div class="right-control">
-            <!-- WebRTC connection for right div -->
-            <video id="rightWebcam" class="video-container"></video>
-        </div>
-    </div>
+    <div class="controls"></div>
 </body>
 </html>
