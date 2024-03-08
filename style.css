@@ -1,0 +1,61 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0; /* Light gray background */
+}
+
+.container {
+    max-width: 600px; /* Adjusted max-width */
+    margin: 50px auto; /* Centering the container vertically and horizontally */
+    padding: 20px;
+    background-color: #ffffff; /* White background */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333333; /* Dark gray text color */
+}
+
+input[type="file"] {
+    display: block;
+    margin: 0 auto; /* Centering the file input horizontally */
+    padding: 10px;
+    border: 2px solid #dddddd; /* Light gray border */
+    border-radius: 5px;
+    background-color: #f9f9f9; /* Light gray background */
+    transition: border-color 0.3s;
+}
+
+input[type="file"]:hover {
+    border-color: #999999; /* Dark gray border on hover */
+}
+
+video {
+    display: block;
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* New styles for left and right control divs */
+.left-control, .right-control {
+    position: fixed;
+    bottom: 20px; /* Adjust the bottom spacing */
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    border-radius: 5px;
+    color: white; /* Text color */
+    cursor: pointer;
+}
+
+.left-control {
+    left: 20px; /* Adjust the left spacing for the left control div */
+}
+
+.right-control {
+    right: 20px; /* Adjust the right spacing for the right control div */
+}

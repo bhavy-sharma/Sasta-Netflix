@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sasta-Netflix</h1>
+
+        <!-- Input for choosing a video file -->
+        <input type="file" accept="video/*" id="videoInput">
+        
+        <!-- Video player -->
+        <video controls id="videoPlayer">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div class="left-control">
+            <!-- Add controls for the left side -->
+            <button class="control-button">Left Control</button>
+        </div>
+        <div class="right-control">
+            <!-- Add controls for the right side -->
+            <button class="control-button">Right Control</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to handle video file selection
+        document.getElementById('videoInput').addEventListener('change', function(event) {
+            var videoPlayer = document.getElementById('videoPlayer');
+            var file = this.files[0];
+            var objectURL = URL.createObjectURL(file);
+            videoPlayer.src = objectURL;
+        });
+
+        // Example event listeners for the control buttons
+        document.querySelector('.left-control .control-button').addEventListener('click', function() {
+            // Perform action for left control button
+            console.log('Left control button clicked');
+        });
+
+        document.querySelector('.right-control .control-button').addEventListener('click', function() {
+            // Perform action for right control button
+            console.log('Right control button clicked');
+        });
+    </script>
+</body>
+</html>
