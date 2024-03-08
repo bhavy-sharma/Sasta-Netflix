@@ -7,11 +7,18 @@
     <link rel="stylesheet" href="sasta-netflix.css">
 </head>
 <body>
+    <script>
+        function tujhe(){
+            var source = document.getElementById("localmedia").files[0];
+            var output = document.getElementById("running");
+            output.src = URL.createObjectURL(source);
+        }
+    </script>
     <div class="container">
         <h1>Sasta-Netflix</h1>
-
+        <input type="file" title="Choose your file" id="localmedia" onchange="tujhe()">
         <!-- Video player for local webcam stream -->
-        <video controls id="localVideo" class="video-container"></video>
+        <video controls id="running" class="video-container"></video>
     </div>
 
     <!-- Webcam stream container for bottom left -->
@@ -31,49 +38,5 @@
             <video id="rightWebcam" class="video-container"></video>
         </div>
     </div>
-
-    <script>
-        // Function to set up WebRTC connection
-        async function setupWebRTC(containerId) {
-            // Get user media for local webcam stream
-            const localStream = await navigator.mediaDevices.getUserMedia({ video: true });
-            const localVideo = document.getElementById('localVideo');
-            localVideo.srcObject = localStream;
-
-            // Create peer connection
-            const peerConnection = new RTCPeerConnection();
-
-            // Add local stream to peer connection
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-            // Handle incoming tracks from remote user
-            peerConnection.ontrack = event => {
-                const remoteVideo = document.createElement('video');
-                remoteVideo.srcObject = event.streams[0];
-                remoteVideo.autoplay = true;
-
-                // Display remote video in the specified container
-                const container = document.getElementById(containerId);
-                container.appendChild(remoteVideo);
-            };
-
-            // Offer to start the peer connection
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
-
-            // Exchange offer with signaling server (not implemented here)
-
-            // For demonstration, create a dummy answer from the remote user
-            const dummyAnswer = new RTCSessionDescription({ type: 'answer', sdp: 'dummy sdp' });
-            await peerConnection.setRemoteDescription(dummyAnswer);
-        }
-
-        // Call setupWebRTC function when the page loads
-        window.onload = function() {
-            // Set up WebRTC connections for left and right divs
-            setupWebRTC('bottomLeftWebcamContainer');
-            setupWebRTC('bottomRightWebcamContainer');
-        };
-    </script>
 </body>
 </html>

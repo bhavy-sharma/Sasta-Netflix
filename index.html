@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Chat</title>
+    <title>Bhavy ka Netflix</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Video Chat</h1>
+        <h1>Sasta Netflix</h1>
 
         <!-- Form for entering name and room -->
         <form id="joinForm">
@@ -34,57 +34,6 @@
             // Redirect to sasta-netflix.html with query parameters
             window.location.href = 'sasta-netflix.html?name=' + encodeURIComponent(name) + '&room=' + encodeURIComponent(room);
         });
-
-        // Function to set up WebRTC connection based on room name
-        async function setupWebRTC(roomName) {
-            // Connect to signaling server and exchange offers/answers (not implemented here)
-
-            // Get user media for local webcam stream
-            const localStream = await navigator.mediaDevices.getUserMedia({ video: true });
-            
-            // Create peer connection
-            const peerConnection = new RTCPeerConnection();
-
-            // Add local stream to peer connection
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-            // Handle incoming tracks from remote user
-            peerConnection.ontrack = event => {
-                const remoteVideo = document.createElement('video');
-                remoteVideo.srcObject = event.streams[0];
-                remoteVideo.autoplay = true;
-
-                // Display remote video in appropriate container based on room name
-                const bottomLeftWebcamContainer = document.getElementById('bottomLeftWebcamContainer');
-                const bottomRightWebcamContainer = document.getElementById('bottomRightWebcamContainer');
-
-                if (roomName === 'leftRoom') {
-                    bottomLeftWebcamContainer.appendChild(remoteVideo);
-                } else if (roomName === 'rightRoom') {
-                    bottomRightWebcamContainer.appendChild(remoteVideo);
-                }
-            };
-
-            // Offer to start the peer connection
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
-
-            // Exchange offer with signaling server (not implemented here)
-
-            // For demonstration, create a dummy answer from the remote user
-            const dummyAnswer = new RTCSessionDescription({ type: 'answer', sdp: 'dummy sdp' });
-            await peerConnection.setRemoteDescription(dummyAnswer);
-        }
-
-        // Call setupWebRTC function when the page loads
-        window.onload = function() {
-            // Get room name from query parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const roomName = urlParams.get('room');
-
-            // Call setupWebRTC function with the room name
-            setupWebRTC(roomName);
-        };
     </script>
 </body>
 </html>
