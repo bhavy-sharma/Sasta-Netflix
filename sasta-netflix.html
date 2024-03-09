@@ -7,38 +7,76 @@
     <link rel="stylesheet" href="sasta-netflix.css">
 </head>
 <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
     <script>
-        function tujhe(){
-            var source = document.getElementById("localmedia").files[0];
-            var output = document.getElementById("running");
-            output.src = URL.createObjectURL(source);
-        }
+        document.addEventListener("DOMContentLoaded", async () => {
+            const queryParams = new URLSearchParams(window.location.search);
+            const name = queryParams.get('name');
+            const room = queryParams.get('room');
 
-        document.addEventListener("DOMContentLoaded", () => {
-            let mediaDevices = navigator.mediaDevices;
+            const mediaDevices = navigator.mediaDevices;
 
-            let left = document.getElementById("leftWebcam");
-            let right = document.getElementById("rightWebcam");
+            const left = document.getElementById("leftWebcam");
+            const right = document.getElementById("rightWebcam");
 
-            // Accessing the user camera and video for left webcam
-            mediaDevices.getUserMedia({ video: true, audio: true })
-                .then((stream) => {
-                    left.srcObject = stream;
-                    left.addEventListener("loadedmetadata", () => {
-                        left.play();
-                    });
-                })
-                .catch(alert);
+            const configuration = {
+                iceServers: [{
+                    urls: ["stun:bn-turn1.xirsys.com"]
+                }, {
+                    username: "GkuPM_1l3cnWx1QSbwqgORyusZF2t0nCpLcjtV936qaZjT4rU1pdkmi2SGAexag8AAAAAGXsZNBiaGF2eS1zaGFybWE=",
+                    credential: "687a1e6c-de19-11ee-984a-0242ac140004",
+                    urls: [
+                        "turn:bn-turn1.xirsys.com:80?transport=udp",
+                        "turn:bn-turn1.xirsys.com:3478?transport=udp",
+                        "turn:bn-turn1.xirsys.com:80?transport=tcp",
+                        "turn:bn-turn1.xirsys.com:3478?transport=tcp",
+                        "turns:bn-turn1.xirsys.com:443?transport=tcp",
+                        "turns:bn-turn1.xirsys.com:5349?transport=tcp"
+                    ]
+                }]
+            };
 
-            // Accessing the user camera and video for right webcam
-            mediaDevices.getUserMedia({ video: true, audio: true })
-                .then((stream) => {
-                    right.srcObject = stream;
-                    right.addEventListener("loadedmetadata", () => {
-                        right.play();
-                    });
-                })
-                .catch(alert);
+            const peerConnectionLeft = new RTCPeerConnection(configuration);
+            const peerConnectionRight = new RTCPeerConnection(configuration);
+
+            const leftStream = await mediaDevices.getUserMedia({ video: true, audio: true });
+            const rightStream = await mediaDevices.getUserMedia({ video: true, audio: true });
+
+            left.srcObject = leftStream;
+            left.play();
+            right.srcObject = rightStream;
+            right.play();
+
+            leftStream.getTracks().forEach(track => peerConnectionLeft.addTrack(track, leftStream));
+            rightStream.getTracks().forEach(track => peerConnectionRight.addTrack(track, rightStream));
+
+            // Connect to the server using Socket.IO
+            const socket = io('/stream');
+            socket.emit('joinRoom', { name, room });
+
+            socket.on('offer', async (data) => {
+                const { offer, user } = data;
+                if (user === 'user1') {
+                    await peerConnectionLeft.setRemoteDescription(offer);
+                    const answer = await peerConnectionLeft.createAnswer();
+                    await peerConnectionLeft.setLocalDescription(answer);
+                    socket.emit('answer', { answer, user });
+                } else if (user === 'user2') {
+                    await peerConnectionRight.setRemoteDescription(offer);
+                    const answer = await peerConnectionRight.createAnswer();
+                    await peerConnectionRight.setLocalDescription(answer);
+                    socket.emit('answer', { answer, user });
+                }
+            });
+
+            socket.on('icecandidate', async (data) => {
+                const { icecandidate, user } = data;
+                if (user === 'user1') {
+                    await peerConnectionLeft.addIceCandidate(icecandidate);
+                } else if (user === 'user2') {
+                    await peerConnectionRight.addIceCandidate(icecandidate);
+                }
+            });
         });
     </script>
     <div class="container">
